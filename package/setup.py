@@ -2,7 +2,7 @@ from setuptools import setup
 from setuptools.command.install import install
 import os, shutil, platform, sys
 
-version = "0.2.22"
+version = "0.2.27"
 with open(os.path.join("biblematesc", "version.txt"), "w", encoding="utf-8") as fileObj:
     fileObj.write(version)
 
@@ -67,7 +67,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            f"bmtc={package}.main:main",
+            f"bmsc={package}.main:main",
             f"{package}={package}.main:main",
             f"{package}mcp={package}.main:mcp",
         ],

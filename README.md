@@ -1,4 +1,4 @@
-# BibleMate AI (繁体中文)
+# BibleMate AI (简体中文)
 
 **BibleMate AI** 是一款突破性的自主 AI 代理，旨在彻底改变您的圣经学习方式。它可以创建学习计划、协调多种圣经工具，并采取多步骤行动来完成复杂的圣经相关任务，例如对特定圣经段落进行深入研究。
 
@@ -221,11 +221,11 @@ BIBLEMATE_MCP_AUDIENCE=
 
 要在模式之间切换，请在 BibleMate AI 提示中使用 `.mode` 命令。这将打开一个选择对话框，您可以在其中选择您偏好的模式。
 
-<img width="714" height="271" alt="图片" src="https://github.com/user-attachments/assets/f836a0ad-ae77-4b07-bb74-f9af5bce26c6" />
+<img width="866" height="629" alt="Image" src="https://github.com/user-attachments/assets/4195363e-75e0-437a-8409-1c216d53cf6f" />
 
 为了帮助使用者了解当前的 AI 模式，输入框的边框颜色会在切换模式时发生变化。
 
-<img width="1732" height="1258" alt="图片" src="https://github.com/user-attachments/assets/0b765955-02e5-4eee-95ca-8cdc5216dd1a" />
+<img width="866" height="629" alt="Image" src="https://github.com/user-attachments/assets/389e6973-8c63-428c-9eab-d6ae0d07cbc6" />
 
 您可以在 `config.py` 中自订代理模式和伙伴模式的边框颜色，方法是更改 `color_agent_mode` 和 `color_partner_mode` 的值。
 
@@ -400,7 +400,7 @@ UBA_API_PRIVATE_KEY=
 1.  安装 Ollama - BibleMate AI 使用 `Ollama` 为语意搜寻生成嵌入。您可以在 https://ollama.com/ 找到说明。
 2.  下载一些资料档案。在 BibleMate AI 提示中输入 `.download` 并按照弹出对话框下载它们。
 
-<img width="510" height="326" alt="图片" src="https://github.com/user-attachments/assets/ee05517f-1d48-47d1-85e8-5c134a646e03" />
+<img width="866" height="629" alt="Image" src="https://github.com/user-attachments/assets/dd95ea09-0850-4b52-9525-2a7cbad80ecb" />
 
 您也可以手动下载档案，解压缩它们，并将它们放在 `~/agentmake/biblemate/data` 目录中，其中 `~` 代表使用者的主目录：
 

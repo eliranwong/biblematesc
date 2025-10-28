@@ -501,7 +501,7 @@ async def main_async():
                 translation = ""
                 async def generate_translation():
                     nonlocal translation_output, translation
-                    translation_output = agentmake(messages, follow_up_prompt="将所提供的内容翻译成繁体中文。不要思考，只需翻译。只提供翻译内容，无需额外评论或解释。", **AGENTMAKE_CONFIG)
+                    translation_output = agentmake(messages, follow_up_prompt="将所提供的内容翻译成简体中文。不要思考，只需翻译。只提供翻译内容，无需额外评论或解释。", **AGENTMAKE_CONFIG)
                     if translation_output:
                         translation = translation_output[-1].get("content", "").strip() if translation_output else ""
                 try:
@@ -512,6 +512,7 @@ async def main_async():
                 except (KeyboardInterrupt, asyncio.CancelledError):
                     display_cancel_message(console)
                     continue
+                messages[-1]["content"] = translation
                 display_info(console, Markdown(translation), title="翻译")
                 # Get input again
                 continue

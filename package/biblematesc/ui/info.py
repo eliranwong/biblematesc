@@ -14,8 +14,8 @@ def get_banner(version):
     """
 
     # --- Configuration and Styling ---
-    TITLE_TEXT = "BIBLEMATE_AI 聖經研讀小夥伴"
-    TAGLINE = "🌿 提升您的查聖體驗 🌿"
+    TITLE_TEXT = "BIBLEMATE_AI 圣经研读小伙伴"
+    TAGLINE = "🌿 提升您的查圣体验 🌿"
     
     # Custom colors using HEX codes for better consistency
     COLOR_SCRIPTURE = "#FFD700"  # Gold

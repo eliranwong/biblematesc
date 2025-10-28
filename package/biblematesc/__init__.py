@@ -160,7 +160,7 @@ config.backup_required = False
 config.export_item = ""
 config.action_list = {
     # general
-    ".translate": "把上一个回应内容翻译成繁体中文",
+    ".translate": "把上一个回应内容翻译成简体中文",
     ".ideas": "构思输入点子",
     ".exit": "退出当前输入",
     # conversations
@@ -261,4 +261,4 @@ def list_dir_content(directory:str="."):
     return "Invalid path!"
 
 def request_chinese_response(prompt: str) -> str:
-    return prompt + "\n\n# Response Language\n\nSimplified Chinese 繁体中文\n\n请使用繁体中文作所有回应，除了引用工具名称或希伯来语或希腊语，或我特别要求你使用英文除外。"
+    return prompt + "\n\n# Response Language\n\nSimplified Chinese 简体中文\n\n请使用简体中文作所有回应，除了引用工具名称或希伯来语或希腊语，或我特别要求你使用英文除外。"
