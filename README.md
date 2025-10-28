@@ -6,6 +6,12 @@
 
 <img width="1732" height="1302" alt="图片" src="https://github.com/user-attachments/assets/cb19d61a-2492-474d-b67a-ef2c59c7bcff" />
 
+## 其他语言版本
+
+英文版： https://github.com/eliranwong/biblemate
+
+繁体中文版： https://github.com/eliranwong/biblematetc
+
 ## 👀 总览
 
 英文：
