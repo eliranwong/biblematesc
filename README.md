@@ -12,6 +12,10 @@
 
 繁体中文版： https://github.com/eliranwong/biblematetc
 
+## 安装例子
+
+https://github.com/eliranwong/biblematesc/blob/main/docs/installation/macOS.md
+
 ## 👀 总览
 
 英文：

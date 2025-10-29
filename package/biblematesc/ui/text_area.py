@@ -76,7 +76,7 @@ async def getTextArea(input_suggestions:list=None, default_entry="", title="", m
                 title=title,
             ),
             Label(
-                "[Ctrl+S] 確定 [Ctrl+Q] 退出" if title else "[Ctrl+S] 確定 [Ctrl+Y] 幫助",
+                "[Ctrl+S] 确定 [Ctrl+Q] 退出" if title else "[Ctrl+S] 确定 [Ctrl+Y] 帮助",
                 align=WindowAlign.RIGHT,
                 style="fg:grey",
             ),
@@ -284,35 +284,35 @@ async def getTextArea(input_suggestions:list=None, default_entry="", title="", m
         if result == "[BIBLE]":
             options = [".bible", ".chapter", ".compare", ".comparechapter", ".chronology"]
             descriptions = [config.action_list[i] for i in options]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Bible-related Features", text="Select a feature:")
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="圣经选项", text="请选择一个选项继续:")
             return select if select else ""
         elif result == "[SEARCH]":
             options = [".search", ".parallel", ".promise", ".topic", ".dictionary", ".encyclopedia", ".lexicon", ".name", ".character", ".location", ".find"]
             descriptions = [config.action_list[i] for i in options]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Search Resources", text="Select to search:")
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="搜索圣经资源", text="请选择一个选项搜索:")
             return select if select else ""
         elif result == "[CROSSREFERENCE]":
             options = [".xref", ".treasury"]
             descriptions = [config.action_list[i] for i in options]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Cross-Reference Features", text="Select an option to continue:")
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="经文串珠功能", text="请选择一个选项继续:")
             return select if select else ""
         elif result == "[VERSE]":
             options = [".index", ".translation", ".discourse", ".morphology"]
             descriptions = [config.action_list[i] for i in options]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Bible Verse Features", text="Select an option to continue:")
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="单节查考功能", text="请选择一个选项继续:")
             return select if select else ""
         elif result == "[COMMENTARY]":
             options = [".aicommentary", ".commentary"]
             descriptions = [config.action_list[i] for i in options]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Commentaries", text="Select an option to continue:")
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="圣经注释", text="请选择一个选项继续:")
             return select if select else ""
         elif result == "[CONVERSATION]":
             options = [".new", ".reload", ".backup", ".edit", ".trim", ".import", ".export", ".find"]
             descriptions = [config.action_list[i] for i in options]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Commentaries", text="Select an option to continue:")
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="对话记录", text="请选择一个选项继续:")
             return select if select else ""
         elif result == "[SAVEPROMPT]":
-            user_input = await DIALOGS.getInputDialog(title="Save Prompt", text="Enter a name:")
+            user_input = await DIALOGS.getInputDialog(title="储存输入内容", text="请输入名称以储存提示词或计划:")
             if user_input:
                 prompt_dir = os.path.join(BIBLEMATE_USER_DIR, "prompts")
                 plan_dir = os.path.join(BIBLEMATE_USER_DIR, "plans")
@@ -327,8 +327,8 @@ async def getTextArea(input_suggestions:list=None, default_entry="", title="", m
             return ""
         elif result == "[DELETEPROMPT]":
             options = [".deleteprompt", ".deleteplan"]
-            descriptions = ["Delete a prompt", "Delete a plan"]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Open Prompt / Plan", text="Select an option to continue:")
+            descriptions = ["删除已存档的指示", "删除已存档的计划"]
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="删除指示/计划", text="请选择一个选项继续:")
             if not select:
                 return ""
             prompts_path = os.path.join(BIBLEMATE_USER_DIR, "prompts")
@@ -340,14 +340,14 @@ async def getTextArea(input_suggestions:list=None, default_entry="", title="", m
                 prefix = plans_path if select == ".deleteplan" else prompts_path
                 suffix = ".plan" if select == ".deleteplan" else ".prompt"
                 options = [i[len(prefix)+1:-(len(suffix))] for i in found]
-                select = await DIALOGS.getValidOptions(options=options, title="Open Plan" if select == ".deleteplan" else "Open Prompt", text="Select a plan:" if select == ".deleteplan" else "Select a prompt:")
+                select = await DIALOGS.getValidOptions(options=options, title="删除计划" if select == ".deleteplan" else "删除指示", text="请选择一个计划来删除:" if select == ".deleteplan" else "请选择一个指示来删除:")
                 if select:
                     os.remove(os.path.join(prefix, select+suffix))
             return ""
         elif result == "[LOADPROMPT]":
             options = [".openprompt", ".openplan"]
-            descriptions = ["Open a prompt", "Open a plan"]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Open Prompt / Plan", text="Select an option to continue:")
+            descriptions = ["开启已存档的指示", "开启已存档的计划"]
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="开启指示/计划", text="请选择一个选项继续:")
             if not select:
                 return ""
             prompts_path = os.path.join(BIBLEMATE_USER_DIR, "prompts")
@@ -359,14 +359,14 @@ async def getTextArea(input_suggestions:list=None, default_entry="", title="", m
                 prefix = plans_path if select == ".openplan" else prompts_path
                 suffix = ".plan" if select == ".openplan" else ".prompt"
                 options = [i[len(prefix)+1:-(len(suffix))] for i in found]
-                select = await DIALOGS.getValidOptions(options=options, title="Open Plan" if select == ".openplan" else "Open Prompt", text="Select a plan:" if select == ".openplan" else "Select a prompt:")
+                select = await DIALOGS.getValidOptions(options=options, title="开启计划" if select == ".openplan" else "开启指示", text="请选择一个计划来打开：" if select == ".openplan" else "请选择一个指示来打开：")
                 if select:
                     config.current_prompt = readTextFile(os.path.join(prefix, select+suffix))
             return ""
         elif result == "[SEARCHPROMPT]":
             options = [".searchprompt", ".searchplan"]
-            descriptions = ["Search prompts", "Search plans"]
-            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="Search Prompts / Plans", text="Select an option to continue:")
+            descriptions = ["搜索已存档的指示", "搜索已存档的计划"]
+            select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="搜索指示/计划", text="请选择一个选项继续:")
             if not select:
                 return ""
             prompts_path = os.path.join(BIBLEMATE_USER_DIR, "prompts")
@@ -377,7 +377,7 @@ async def getTextArea(input_suggestions:list=None, default_entry="", title="", m
             if found:
                 prefix = plans_path if select == ".searchplan" else prompts_path
                 suffix = ".plan" if select == ".searchplan" else ".prompt"
-                query = await DIALOGS.getInputDialog(title="Search Plans" if select == ".searchplan" else "Search Prompts", text="Enter a search query:")
+                query = await DIALOGS.getInputDialog(title="搜索计划" if select == ".searchplan" else "搜索指示", text="请输入搜索内容：")
                 if query:
                     searchFolder(prefix, query=query, filter="*"+suffix)
                     print()

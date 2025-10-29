@@ -2,7 +2,7 @@ from biblematesc.core.systems import *
 from biblematesc.uba.dialogs import *
 from biblematesc.ui.text_area import getTextArea
 from biblematesc.ui.info import get_banner
-from biblematesc import config, request_chinese_response, DIALOGS, BIBLEMATE_VERSION, AGENTMAKE_CONFIG, BIBLEMATE_USER_DIR, BIBLEMATEDATA, fix_string, write_user_config, list_dir_content
+from biblematesc import config, request_chinese_response, CONFIG_FILE_BACKUP, DIALOGS, BIBLEMATE_VERSION, AGENTMAKE_CONFIG, BIBLEMATE_USER_DIR, BIBLEMATEDATA, fix_string, write_user_config, list_dir_content
 from biblematesc.uba.api import DEFAULT_MODULES, run_uba_api
 from pathlib import Path
 import urllib.parse
@@ -13,7 +13,7 @@ from fastmcp import Client
 from fastmcp.client.transports import StreamableHttpTransport
 from agentmake.plugins.uba.lib.BibleBooks import BibleBooks
 from agentmake.plugins.uba.lib.BibleParser import BibleVerseParser
-from agentmake import agentmake, getOpenCommand, getDictionaryOutput, edit_file, edit_configurations, extractText, readTextFile, writeTextFile, getCurrentDateTime, AGENTMAKE_USER_DIR, USER_OS, DEVELOPER_MODE, DEFAULT_AI_BACKEND, DEFAULT_TEXT_EDITOR
+from agentmake import agentmake, getOpenCommand, getDictionaryOutput, edit_file, edit_configurations, extractText, readTextFile, writeTextFile, getCurrentDateTime, AGENTMAKE_USER_DIR, USER_OS, DEVELOPER_MODE, DEFAULT_TEXT_EDITOR
 from agentmake.utils.files import searchFolder, isExistingPath
 from agentmake.etextedit import launch_async
 from agentmake.utils.manage_package import getPackageLatestVersion
@@ -56,14 +56,25 @@ if not sys.stdin.isatty():
         args.default = [stdin_text]
 
 # write to the `config.py` file temporarily for the MCP server to pick it up
-if args.backend:
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.py"), "a", encoding="utf-8") as fileObj:
-        fileObj.write(f'''\nbackend="{args.backend}"''')
-    config.backend = args.backend
-else:
-    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.py"), "a", encoding="utf-8") as fileObj:
-        fileObj.write(f'''\nbackend="{DEFAULT_AI_BACKEND}"''')
-    config.backend = DEFAULT_AI_BACKEND
+config.backend = args.backend if args.backend else os.getenv("DEFAULT_AI_BACKEND") if os.getenv("DEFAULT_AI_BACKEND") else "googleai"
+with open(CONFIG_FILE_BACKUP, "a", encoding="utf-8") as fileObj:
+    fileObj.write(f'''\nconfig.backend="{config.backend}"''')
+
+AGENTMAKE_ENV_PATH = os.path.join(AGENTMAKE_USER_DIR, "agentmake.env")
+if config.backend == "googleai" and not os.getenv("GOOGLEAI_API_KEY"):
+    googleai_api_key = DIALOGS.getInputDialog_sync(title="Google AI API Key", text="请输入您的 Google AI API 钥匙:")
+    if googleai_api_key and googleai_api_key.strip():
+        googleai_api_key = googleai_api_key.strip()
+        agentmake_env_content = readTextFile(AGENTMAKE_ENV_PATH)
+        if os.path.isfile(AGENTMAKE_ENV_PATH) and "\nGOOGLEAI_API_KEY=" in agentmake_env_content:
+            writeTextFile(AGENTMAKE_ENV_PATH, re.sub("\nGOOGLEAI_API_KEY=[^\n]*?\n", f'\nGOOGLEAI_API_KEY="{googleai_api_key}"\n', agentmake_env_content))
+        else:
+            with open(AGENTMAKE_ENV_PATH, "a", encoding="utf-8") as fileObj:
+                fileObj.write(f'''\nGOOGLEAI_API_KEY="{googleai_api_key}"\n''')
+        print("""###   设定更新成功！   ###
+请输入 `biblematesc` 重新启动 BibleMate AI。
+""")
+        exit()
 
 AGENTMAKE_CONFIG["backend"] = config.backend
 DEFAULT_SYSTEM = "您是查考圣经研读小伙伴 BibleMate AI，一个旨在协助用户研读圣经的人工智能代理。"
@@ -413,9 +424,9 @@ async def main_async():
                         try:
                             agentmake("您好！", system=DEFAULT_SYSTEM)
                         except Exception as e:
-                            print("Connection failed! Please ensure that you have a stable internet connection and that my AI backend and model are properly configured.")
-                            print("Viist https://github.com/eliranwong/agentmake#supported-backends for help about the backend configuration.\n")
-                            if click.confirm("Do you want to configure my AI backend and model now?", default=True):
+                            print("连接失败！请确认您的网络连接稳定，并确保我 AI 供应端和模型配置正确。")
+                            print("开启 https://github.com/eliranwong/agentmake#supported-backends 以获取更多咨询。\n")
+                            if click.confirm("您是否想现在配置我的 AI 供应端和模型？", default=True):
                                 edit_configurations()
                                 display_info(console, "请重新启动 BibleMate AI，启用改动后的设定！")
                                 exit()
@@ -1519,7 +1530,7 @@ You provide the converted instruction directly, without any additional commentar
                 config.backup_required = False
     
     # back up configurations
-    write_user_config(backup=True)
+    #write_user_config()
     # reset terminal window title
     clear_title()
 
