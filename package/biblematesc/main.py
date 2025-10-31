@@ -14,7 +14,7 @@ from fastmcp.client.transports import StreamableHttpTransport
 from agentmake.plugins.uba.lib.BibleBooks import BibleBooks
 from agentmake.plugins.uba.lib.BibleParser import BibleVerseParser
 from agentmake import agentmake, getOpenCommand, getDictionaryOutput, edit_file, edit_configurations, extractText, readTextFile, writeTextFile, getCurrentDateTime, AGENTMAKE_USER_DIR, USER_OS, DEVELOPER_MODE, DEFAULT_TEXT_EDITOR
-from agentmake.utils.files import searchFolder, isExistingPath
+from agentmake.utils.files import searchFolder, isExistingPath, sanitize_filename
 from agentmake.etextedit import launch_async
 from agentmake.utils.manage_package import getPackageLatestVersion
 from rich.console import Console
@@ -31,7 +31,7 @@ if not USER_OS == "Windows":
     import readline  # for better input experience
 
 # set window title
-set_title(f"圣经研读小伙伴 BibleMate AI")
+set_title("圣经研读小伙伴 BibleMate AI")
 
 parser = argparse.ArgumentParser(description = f"""BibleMate AI {BIBLEMATE_VERSION} CLI options""")
 # global options
@@ -206,13 +206,15 @@ def display_info(console, info, title=None, border_style=config.color_info_borde
     console.print(info_panel)
     console.print()
 
-def backup_conversation(messages, master_plan, console=None, storage_path=None):
+def backup_conversation(messages, master_plan, console=None, storage_path=None, title=None):
     """Backs up the current conversation to the user's directory."""
     if len(messages) > len(DEFAULT_MESSAGES) and ((not console) or (console and storage_path) or (console and not storage_path and config.backup_required)):
         # determine storage path
         if not storage_path:
             if console:
                 timestamp = getCurrentDateTime()
+                if title:
+                    timestamp += "_"+sanitize_filename(title)[:50].replace(" ", "_")
                 storage_path = os.path.join(BIBLEMATE_USER_DIR, "chats", timestamp)
             else:
                 storage_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "temp")
@@ -234,8 +236,7 @@ def backup_conversation(messages, master_plan, console=None, storage_path=None):
             console.save_html(html_file, inline_styles=True, theme=MONOKAI)
         # Inform users of the backup location
         if console:
-            info = f"已经备份到： {storage_path}\n报告已存档： {html_file}"
-            display_info(console, info)
+            display_info(console, storage_path, title="备份")
 
 def get_border_style():
     if config.agent_mode:
@@ -354,7 +355,7 @@ async def main_async():
         template_pattern = "|".join(template_list)
         template_pattern = f"""^({template_pattern})"""
 
-        user_request = ""
+        original_request = user_request = ""
         master_plan = ""
         messages = deepcopy(DEFAULT_MESSAGES) # set the tone
 
@@ -405,6 +406,27 @@ async def main_async():
                     task.cancel()
                     await asyncio.sleep(0) # Allow cancellation to propagate
                     raise # Re-raise CancelledError
+            # gnerate title
+            async def generate_title():
+                nonlocal console, original_request
+                if not original_request:
+                    return ""
+                generated_title_output = ""
+                generated_title = ""
+                async def run_prompt_engineering():
+                    nonlocal generated_title_output, generated_title
+                    generated_title_output = agentmake(original_request, system=get_system_generate_longer_title(), **AGENTMAKE_CONFIG)
+                    if generated_title_output:
+                        generated_title = generated_title_output[-1].get("content", "").strip().replace("标题: ", "")
+                try:
+                    await thinking(run_prompt_engineering, "撰写标题中 ...")
+                    if not generated_title_output:
+                        display_cancel_message(console)
+                except (KeyboardInterrupt, asyncio.CancelledError):
+                    display_cancel_message(console)
+                if generated_title:
+                    set_title(f"圣经研读小伙伴 📝 {generated_title}")
+                return generated_title
 
             if not APP_START and args.exit:
                 break
@@ -729,7 +751,10 @@ async def main_async():
                         print("只接受包含 `conversation.py` 和 `master_plan.md` 的文件夹。")
                         os.chdir(cwd)
                         continue
-                    backup_conversation(messages, master_plan, console)
+                    if config.backup_required:
+                        generated_title = await generate_title()
+                        if generated_title:
+                            backup_conversation(messages, master_plan, console, title=generated_title)
                     config.backup_required = False
                     messages = [{"role": i["role"], "content": i["content"]} for i in eval(readTextFile(file_path)) if i.get("role", "") in ("user", "assistant")]
                     if messages:
@@ -771,7 +796,10 @@ async def main_async():
             # predefined operations with `.` commands
             if user_request in config.action_list:
                 if user_request == ".backup":
-                    backup_conversation(messages, master_plan, console)
+                    if config.backup_required:
+                        generated_title = await generate_title()
+                        if generated_title:
+                            backup_conversation(messages, master_plan, console, title=generated_title)
                     config.backup_required = False
                 elif user_request == ".help":
                     actions = "\n".join([f"- `{k}`: {v}" for k, v in config.action_list.items()])
@@ -1028,10 +1056,15 @@ https://github.com/eliranwong/biblemate
                         write_user_config()
                         display_info(console, f"预设原文字典设定为 `{config.default_lexicon}`", title="设定")
                 elif user_request in (".new", ".exit"):
-                    backup_conversation(messages, master_plan, console) # backup
+                    # backup before reset/exit
+                    if config.backup_required:
+                        generated_title = await generate_title()
+                        if generated_title:
+                            backup_conversation(messages, master_plan, console, title=generated_title)
                     config.backup_required = False
                 # reset
                 if user_request == ".new":
+                    set_title("圣经研读小伙伴 BibleMate AI")
                     user_request = ""
                     master_plan = ""
                     messages = deepcopy(DEFAULT_MESSAGES)
@@ -1235,7 +1268,9 @@ https://github.com/eliranwong/biblemate
                         conversation_broken = True
                         break
                     # display refined instruction
-                    display_info(console, Markdown(messages[-1]['content']), title="Refined Instruction", border_style=get_border_style())
+                    display_info(console, Markdown(messages[-1]['content']), title="优化后的指示", border_style=get_border_style())
+                elif config.prompt_engineering:
+                    display_info(console, Markdown(messages[-1]['content']), title="优化后的指示", border_style=get_border_style())
                 try:
                     await process_tool(specified_tool, user_request)
                 except (KeyboardInterrupt, asyncio.CancelledError):
@@ -1549,7 +1584,10 @@ Available tools are: {available_tools}.
             # Backup
             if not conversation_broken:
                 print()
-                backup_conversation(messages, master_plan, console)
+                if config.backup_required:
+                    generated_title = await generate_title()
+                    if generated_title:
+                        backup_conversation(messages, master_plan, console, title=generated_title)
                 config.backup_required = False
     
     # back up configurations
