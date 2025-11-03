@@ -1554,7 +1554,7 @@ def retrieve_english_bible_verses(request:str) -> str:
 
 @mcp.tool
 def retrieve_chinese_bible_verses(request:str) -> str:
-    """retrieve traditional Chinese Bible 中文和和本聖經 verses; bible verse reference(s) must be given, e.g. John 3:16-17; single or multiple references accepted, e.g. Deut 6:4; Gen 1:26-27"""
+    """retrieve simplified Chinese Bible 中文和和本圣经 verses; bible verse reference(s) must be given, e.g. John 3:16-17; single or multiple references accepted, e.g. Deut 6:4; Gen 1:26-27"""
     global BibleVerseParser, run_uba_api
     refs = BibleVerseParser(True, language="tc").extractAllReferencesReadable(request)
     if not refs:
@@ -1576,7 +1576,7 @@ def retrieve_english_bible_chapter(request:str) -> str:
 
 @mcp.tool
 def retrieve_chinese_bible_chapter(request:str) -> str:
-    """retrieve a whole Bible chapter in traditional Chinese 繁體中文; bible chapter reference must be given, e.g. John 3"""
+    """retrieve a whole Bible chapter in simplified Chinese 简体中文; bible chapter reference must be given, e.g. John 3"""
     global BibleVerseParser, run_uba_api, re
     refs = re.sub("[Cc]hapter ([0-9])", r"\1", request)
     refs = BibleVerseParser(True, language="tc").extractAllReferencesReadable(refs)
