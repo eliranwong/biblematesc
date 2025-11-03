@@ -312,7 +312,7 @@ async def getTextArea(input_suggestions:list=None, default_entry="", title="", m
             select = await DIALOGS.getValidOptions(options=options, descriptions=descriptions, title="对话记录", text="请选择一个选项继续:")
             return select if select else ""
         elif result == "[SAVEPROMPT]":
-            user_input = await DIALOGS.getInputDialog(title="储存输入内容", text="请输入名称以储存提示词或计划:")
+            user_input = await DIALOGS.getInputDialog(title="储存计划" if text_area.text.startswith("@@") else "储存指示", text="请输入名称以储存提示词或计划:")
             if user_input:
                 prompt_dir = os.path.join(BIBLEMATE_USER_DIR, "prompts")
                 plan_dir = os.path.join(BIBLEMATE_USER_DIR, "plans")
