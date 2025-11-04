@@ -805,7 +805,13 @@ async def main_async():
                     actions = "\n".join([f"- `{k}`: {v}" for k, v in config.action_list.items()])
                     help_info = f"""## BibleMate AI
 
+https://biblemate.ai
+
 https://github.com/eliranwong/biblemate
+
+## 功能简介
+
+https://github.com/eliranwong/biblematesc/tree/main/docs/tutorials
 
 ## 特定指令
 
